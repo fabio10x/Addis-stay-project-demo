@@ -1,32 +1,66 @@
 import { supabase } from "./supabase"
 import { useEffect } from "react"
 import { useState } from "react"
-import RoomCard from "./components/RoomCard"
 import AddRoomForm from "./components/AddRoomForm"
+import AuthForm from "./components/AuthForm"
+import Header from "./components/Header"
+import RoomList from "./components/RoomList"
 
 
 function App() {
+
+  const [user, setUser] = useState({ email: 'admin@addisstay.com' });
+
+  async function handleSignUp(email, password) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
+    })
+    if (error) alert(error.message);
+    else alert("Check your email for confirmation link!");
+  }
+
+  async function handleSignIn(email, password) {
+    const { data, error } = await
+      supabase.auth.signInWithPassword({ email, password });
+    if (error) alert(error.message);
+  }
 
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
+
+    /*
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } =
+      supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+      });
+    */
+
     getRooms();
+    // return () => subscription.unsubscribe();
   }, []);
 
   async function getRooms() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('rooms')
-      .select('*');
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('rooms')
+        .select('*');
 
-    if (error) {
-      console.log("Error fetching:", error.message);
-    } else {
+      if (error) throw error;
       setRooms(data || []);
+    } catch (error) {
+      console.error("Error fetching rooms:", error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function addRoom(name, price) {
@@ -73,44 +107,28 @@ function App() {
   }
 
 
+  if (!user) {
+    return (
+      <AuthForm
+        onSignIn={handleSignIn}
+        onSignUp={handleSignUp}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      {/* Navbar */}
-      <nav className="bg-white border-b border-slate-200 py-4 px-6 md:px-12 sticky top-0 z-10 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Addis stay Admin</h1>
-      </nav>
+      <Header />
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto py-10 px-6 md:px-12">
-
-        {/* Add Room Form Component */}
         <AddRoomForm addRoom={addRoom} adding={adding} />
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <div className="animate-pulse flex flex-col items-center">
-              <div className="h-12 w-12 rounded-full bg-slate-200 mb-4"></div>
-              <p className="text-slate-500 font-medium animate-bounce">Checking rooms....</p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {rooms.length > 0 ? (
-              rooms.map((room) => (
-                <RoomCard
-                  key={room.id}
-                  room={room}
-                  removeRoom={removeRoom}
-                  toggleRoomStatus={toggleRoomStatus}
-                />
-              ))
-            ) : (
-              <div className="col-span-full py-20 text-center">
-                <p className="text-slate-400">No rooms found.</p>
-              </div>
-            )}
-          </div>
-        )}
+        <RoomList
+          rooms={rooms}
+          loading={loading}
+          removeRoom={removeRoom}
+          toggleRoomStatus={toggleRoomStatus}
+        />
       </main>
     </div>
   )
