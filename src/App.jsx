@@ -9,7 +9,10 @@ import RoomList from "./components/RoomList"
 
 function App() {
 
-  const [user, setUser] = useState({ email: 'admin@addisstay.com' });
+  const [user, setUser] = useState(null);
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
   async function handleSignUp(email, password) {
     const { data, error } = await supabase.auth.signUp({
@@ -26,13 +29,9 @@ function App() {
     if (error) alert(error.message);
   }
 
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [adding, setAdding] = useState(false);
-
   useEffect(() => {
 
-    /*
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
@@ -41,10 +40,10 @@ function App() {
       supabase.auth.onAuthStateChange((_event, session) => {
         setUser(session?.user ?? null);
       });
-    */
+
 
     getRooms();
-    // return () => subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
 
   async function getRooms() {
