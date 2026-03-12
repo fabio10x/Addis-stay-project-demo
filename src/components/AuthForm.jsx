@@ -50,7 +50,7 @@ const AuthForm = ({ onSignIn, onSignUp }) => {
 
                     <div className="flex flex-col gap-4 pt-4">
                         <button
-                            type="button"
+                            type="submit"
                             onClick={(e) => handleSubmit(e, 'signin')}
                             className="w-full bg-black text-white font-bold py-4 uppercase tracking-widest hover:bg-slate-800 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
                         >
