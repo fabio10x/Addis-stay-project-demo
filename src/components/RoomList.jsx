@@ -1,6 +1,6 @@
 import RoomCard from "./RoomCard"
 
-const RoomList = ({ rooms, loading, removeRoom, toggleRoomStatus }) => {
+const RoomList = ({ rooms, loading, removeRoom, toggleRoomStatus, isAdmin }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -21,6 +21,8 @@ const RoomList = ({ rooms, loading, removeRoom, toggleRoomStatus }) => {
             room={room}
             removeRoom={removeRoom}
             toggleRoomStatus={toggleRoomStatus}
+            // we passes is admin here to port it to room card as a props
+            isAdmin={isAdmin}
           />
         ))
       ) : (

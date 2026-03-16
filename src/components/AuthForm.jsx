@@ -68,7 +68,7 @@ const AuthForm = ({ onSignIn, onSignUp }) => {
                 </form>
 
                 <p className="mt-8 text-xs font-medium text-slate-500 uppercase tracking-widest text-center">
-                    © 2026 Addis Stay • Professional Portal
+                    © 2026 Addis Stay • Professional Admin Portal
                 </p>
             </div>
         </div>

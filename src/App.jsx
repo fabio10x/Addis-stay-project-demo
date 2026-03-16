@@ -13,6 +13,8 @@ function App() {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  // we did this because we want to show the form only when the admin turns true and not to the users
+  const [showAuth, setShowAuth] = useState(false);
 
   async function handleSignUp(email, password) {
     const { data, error } = await supabase.auth.signUp({
@@ -106,27 +108,40 @@ function App() {
   }
 
 
-  if (!user) {
-    return (
-      <AuthForm
-        onSignIn={handleSignIn}
-        onSignUp={handleSignUp}
-      />
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      <Header />
+      <div className="p-4 text-center border-b border-slate-200">
+        {user ? (
+          <span className="text-sm font-bold text-green-600">
+            Manager Mode: You can edit inventory
+          </span>
+        ) : (
+          <span className="text-sm font-bold text-slate-400">
+            Guest Mode: View availability only
+          </span>
+        )}
+      </div>
+
+      <Header user={user} onLoginClick={() => setShowAuth(!showAuth)} />
+
+      {showAuth && !user && (
+        <div className="max-w-md mx-auto mt-8">
+          <AuthForm onSignIn={handleSignIn} onSignUp={handleSignUp} />
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto py-10 px-6 md:px-12">
-        <AddRoomForm addRoom={addRoom} adding={adding} />
+        {/* we wrote the user && because we want the form to be shown only for the manager(admin) not the user  */}
+        {user && <AddRoomForm addRoom={addRoom} adding={adding} />}
 
         <RoomList
           rooms={rooms}
           loading={loading}
           removeRoom={removeRoom}
           toggleRoomStatus={toggleRoomStatus}
+          isAdmin={user ? true : false}
         />
       </main>
     </div>
